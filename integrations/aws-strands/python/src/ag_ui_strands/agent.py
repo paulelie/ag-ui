@@ -7,8 +7,11 @@ import json
 import logging
 import uuid
 from typing import Any, AsyncIterator, Dict, List
-
+from datetime import datetime
 from strands import Agent as StrandsAgentCore
+from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig, RetrievalConfig
+from bedrock_agentcore.memory.integrations.strands.session_manager import AgentCoreMemorySessionManager
+import boto3
 
 logger = logging.getLogger(__name__)
 from ag_ui.core import (
@@ -51,6 +54,7 @@ class StrandsAgent:
         description: str = "",
         config: "StrandsAgentConfig | None" = None,
     ):
+        logger.debug(f"Initialized StrandsAgent: {name}")
         # Store template agent configuration for creating fresh instances
         self._model = agent.model
         self._system_prompt = agent.system_prompt
@@ -79,10 +83,23 @@ class StrandsAgent:
         # Each thread (user session) maintains its own conversation state
         thread_id = input_data.thread_id or "default"
         if thread_id not in self._agents_by_thread:
+            
+            # Configure memory
+            logger.info(f"Creating session manager for thread_id={thread_id}")
+            # Create session manager
+            session_manager = None
+            if(self.config.agentcore_memory_config):
+                session_manager = AgentCoreMemorySessionManager(
+                    agentcore_memory_config=self.config.agentcore_memory_config,
+                    region_name=self.config.strands_agentcore_memory_config.region_name or "us-west-2",
+                    boto_session=self.config.strands_agentcore_memory_config.boto_session or boto3.Session(region_name=self.config.strands_agentcore_memory_config.region_name)
+                )
+            
             self._agents_by_thread[thread_id] = StrandsAgentCore(
                 model=self._model,
                 system_prompt=self._system_prompt,
                 tools=self._tools,
+                session_manager=session_manager,
                 **self._agent_kwargs,
             )
         strands_agent = self._agents_by_thread[thread_id]

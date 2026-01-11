@@ -16,7 +16,9 @@ from typing import (
 )
 
 from ag_ui.core import RunAgentInput
-
+from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig
+import boto3
+from botocore.config import Config as BotocoreConfig
 
 StatePayload = Dict[str, Any]
 
@@ -76,6 +78,12 @@ class ToolBehavior:
     state_from_result: Optional[StateFromResult] = None
     custom_result_handler: Optional[CustomResultHandler] = None
 
+@dataclass
+class StrandsAgentCoreMemorySessionConfig:
+    """Configuration for region, and custom boto3 session if needed"""
+    region_name: Optional[str] = None
+    boto_session: Optional[boto3.Session] = None
+    boto_client_config: Optional[BotocoreConfig] = None
 
 @dataclass
 class StrandsAgentConfig:
@@ -83,7 +91,8 @@ class StrandsAgentConfig:
 
     tool_behaviors: Dict[str, ToolBehavior] = field(default_factory=dict)
     state_context_builder: Optional[StateContextBuilder] = None
-
+    agentcore_memory_config: Optional[AgentCoreMemoryConfig] = None
+    strands_agentcore_memory_config: Optional[StrandsAgentCoreMemorySessionConfig] = None
 
 async def maybe_await(value: Any) -> Any:
     """Await coroutine-like values produced by hook callables."""

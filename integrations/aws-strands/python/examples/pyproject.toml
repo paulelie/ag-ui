@@ -14,6 +14,7 @@ uvicorn = "^0.34.3"
 strands-agents = {extras = ["gemini"], version = "^1.15.0"}
 strands-agents-tools = "^0.2.14"
 ag_ui_strands = {path = "..", develop = true}
+bedrock_agentcore = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
