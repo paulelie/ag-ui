@@ -8,6 +8,7 @@ from .utils import create_strands_app
 from .endpoint import add_strands_fastapi_endpoint, add_ping
 from .config import (
     StrandsAgentConfig,
+    StrandsAgentCoreMemorySessionConfig,
     ToolBehavior,
     ToolCallContext,
     ToolResultContext,
@@ -20,6 +21,7 @@ __all__ = [
     "add_strands_fastapi_endpoint",
     "add_ping",
     "StrandsAgentConfig",
+    "StrandsAgentCoreMemorySessionConfig",
     "ToolBehavior",
     "ToolCallContext",
     "ToolResultContext",
